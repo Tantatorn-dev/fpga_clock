@@ -54,15 +54,25 @@ end component;
 component mux4_4_1 is
 port(in1,in2, in3, in4: in STD_LOGIC_VECTOR (3 downto 0);
 	s: in STD_LOGIC_VECTOR (1 downto 0);
+	dot: out STD_LOGIC;
 	z, comm: out STD_LOGIC_VECTOR (3 downto 0));
 end component;
 
+component time_counter is
+    Port ( clk_second : in  STD_LOGIC;
+           a_out : out  STD_LOGIC_VECTOR (3 downto 0);
+           b_out : out  STD_LOGIC_VECTOR (3 downto 0);
+           c_out : out  STD_LOGIC_VECTOR (3 downto 0);
+           d_out : out  STD_LOGIC_VECTOR (3 downto 0));
+end component;
+
 signal count_mux : integer := 0;
-signal a: std_logic_vector (3 downto 0) := "0000";
-signal b: std_logic_vector (3 downto 0) := "0001";
-signal c: std_logic_vector (3 downto 0) := "0010";
-signal d: std_logic_vector (3 downto 0) := "0011";
+signal a: std_logic_vector (3 downto 0);
+signal b: std_logic_vector (3 downto 0);
+signal c: std_logic_vector (3 downto 0);
+signal d: std_logic_vector (3 downto 0);
 signal clk_mux : std_logic;
+signal clk_s : std_logic;
 signal sevseg_in : std_logic_vector (3 downto 0);
 
 begin
@@ -77,7 +87,16 @@ divider : clock_divider
 port map (
 	clk => Clk,
 	clock_out_2000Hz => clk_mux,
-	clock_out_1Hz => Dot
+	clock_out_1Hz => clk_s
+);
+
+t_counter : time_counter
+port map (
+	clk_second => clk_s,
+	a_out => a,
+	b_out => b,
+	c_out => c,
+	d_out => d
 );
 
 display_mux : mux4_4_1
@@ -86,6 +105,7 @@ port map (
 	in2 => b,
 	in3 => c,
 	in4 => d,
+	dot => Dot,
 	comm => Common,
 	s => std_logic_vector(to_unsigned(count_mux, 2)),
 	z => sevseg_in
@@ -107,3 +127,4 @@ end process;
 
 
 end Behavioral;
+

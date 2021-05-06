@@ -1,3 +1,22 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date:    00:56:24 05/06/2021 
+-- Design Name: 
+-- Module Name:    clock_divider - Behavioral 
+-- Project Name: 
+-- Target Devices: 
+-- Tool versions: 
+-- Description: 
+--
+-- Dependencies: 
+--
+-- Revision: 
+-- Revision 0.01 - File Created
+-- Additional Comments: 
+--
+----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.ALL;
@@ -21,7 +40,7 @@ process(clk)
 begin
 	if(clk'event and clk='1') then
 		count <= count+1;
-		if (count = 20000000) then
+		if (count = 1000000) then
 		tmp <= NOT tmp;
 		count <= 1;
 		end if;
