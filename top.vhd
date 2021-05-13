@@ -34,7 +34,12 @@ entity top is
     Port ( SevSeg : out  STD_LOGIC_VECTOR (6 downto 0);
 			  Clk : in STD_LOGIC ;
 			  Dot : out STD_LOGIC ;
-           Common : out  STD_LOGIC_VECTOR (3 downto 0));
+			  ViewMode : in STD_LOGIC;
+           Common : out  STD_LOGIC_VECTOR (3 downto 0);
+			  SetAlarmMode : in STD_LOGIC;
+			  IncTime : in STD_LOGIC;
+			  DecTime : in STD_LOGIC
+			  );
 end top;
 
 architecture Behavioral of top is
@@ -60,17 +65,66 @@ end component;
 
 component time_counter is
     Port ( clk_second : in  STD_LOGIC;
+			  x_out : out  STD_LOGIC_VECTOR (3 downto 0);
+			  y_out : out  STD_LOGIC_VECTOR (3 downto 0);
            a_out : out  STD_LOGIC_VECTOR (3 downto 0);
            b_out : out  STD_LOGIC_VECTOR (3 downto 0);
            c_out : out  STD_LOGIC_VECTOR (3 downto 0);
            d_out : out  STD_LOGIC_VECTOR (3 downto 0));
 end component;
 
+component alarm_counter is
+    Port ( clk_second : in  STD_LOGIC;
+			  x_out : out  STD_LOGIC_VECTOR (3 downto 0);
+			  y_out : out  STD_LOGIC_VECTOR (3 downto 0);
+           a_out : out  STD_LOGIC_VECTOR (3 downto 0);
+           b_out : out  STD_LOGIC_VECTOR (3 downto 0);
+           c_out : out  STD_LOGIC_VECTOR (3 downto 0);
+           d_out : out  STD_LOGIC_VECTOR (3 downto 0));
+end component;
+
+component view_controller is
+    Port ( x_in : in  STD_LOGIC_VECTOR (3 downto 0);
+           y_in : in  STD_LOGIC_VECTOR (3 downto 0);
+           a_in : in  STD_LOGIC_VECTOR (3 downto 0);
+           b_in : in  STD_LOGIC_VECTOR (3 downto 0);
+           c_in : in  STD_LOGIC_VECTOR (3 downto 0);
+           d_in : in  STD_LOGIC_VECTOR (3 downto 0);
+           out_1 : out  STD_LOGIC_VECTOR (3 downto 0);
+           out_2 : out  STD_LOGIC_VECTOR (3 downto 0);
+           out_3 : out  STD_LOGIC_VECTOR (3 downto 0);
+           out_4 : out  STD_LOGIC_VECTOR (3 downto 0);
+           view_select : in  STD_LOGIC);
+end component;
+
 signal count_mux : integer := 0;
+
+signal x: std_logic_vector (3 downto 0);
+signal y: std_logic_vector (3 downto 0);
 signal a: std_logic_vector (3 downto 0);
 signal b: std_logic_vector (3 downto 0);
 signal c: std_logic_vector (3 downto 0);
 signal d: std_logic_vector (3 downto 0);
+
+signal x_t: std_logic_vector (3 downto 0);
+signal y_t: std_logic_vector (3 downto 0);
+signal a_t: std_logic_vector (3 downto 0);
+signal b_t: std_logic_vector (3 downto 0);
+signal c_t: std_logic_vector (3 downto 0);
+signal d_t: std_logic_vector (3 downto 0);
+
+signal x_a: std_logic_vector (3 downto 0);
+signal y_a: std_logic_vector (3 downto 0);
+signal a_a: std_logic_vector (3 downto 0);
+signal b_a: std_logic_vector (3 downto 0);
+signal c_a: std_logic_vector (3 downto 0);
+signal d_a: std_logic_vector (3 downto 0);
+
+signal n1: std_logic_vector (3 downto 0);
+signal n2: std_logic_vector (3 downto 0);
+signal n3: std_logic_vector (3 downto 0);
+signal n4: std_logic_vector (3 downto 0);
+
 signal clk_mux : std_logic;
 signal clk_s : std_logic;
 signal sevseg_in : std_logic_vector (3 downto 0);
@@ -93,18 +147,66 @@ port map (
 t_counter : time_counter
 port map (
 	clk_second => clk_s,
-	a_out => a,
-	b_out => b,
-	c_out => c,
-	d_out => d
+	x_out => x_t,
+	y_out => y_t,
+	a_out => a_t,
+	b_out => b_t,
+	c_out => c_t,
+	d_out => d_t
+);
+
+a_counter : alarm_counter
+port map (
+	clk_second => clk_s,
+	x_out => x_a,
+	y_out => y_a,
+	a_out => a_a,
+	b_out => b_a,
+	c_out => c_a,
+	d_out => d_a
+);  
+
+-- check which mode is on : time or set alarm mode
+process (clk_s, SetAlarmMode)
+begin
+	if (SetAlarmMode = '1') then
+	 x <= x_a;
+	 y <= y_a;
+	 a <= a_a;
+	 b <= b_a;
+	 c <= c_a;
+	 d <= d_a;
+	else
+	 x <= x_t;
+	 y <= y_t;
+	 a <= a_t;
+	 b <= b_t;
+	 c <= c_t;
+	 d <= d_t;
+	end if;
+end process;
+
+view : view_controller
+port map (
+	x_in => x,
+   y_in => y,
+   a_in => a,
+   b_in => b,
+   c_in => c,
+   d_in => d,
+   out_1 => n1,
+	out_2 => n2,
+	out_3 => n3,
+	out_4 => n4,        
+   view_select => ViewMode
 );
 
 display_mux : mux4_4_1
 port map (
-	in1 => a,
-	in2 => b,
-	in3 => c,
-	in4 => d,
+	in1 => n1,
+	in2 => n2,
+	in3 => n3,
+	in4 => n4,
 	dot => Dot,
 	comm => Common,
 	s => std_logic_vector(to_unsigned(count_mux, 2)),

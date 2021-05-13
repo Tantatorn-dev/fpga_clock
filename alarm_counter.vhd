@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date:    13:36:58 05/06/2021 
+-- Create Date:    01:42:04 05/14/2021 
 -- Design Name: 
--- Module Name:    time_counter - Behavioral 
+-- Module Name:    alarm_counter - Behavioral 
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
@@ -30,7 +30,7 @@ use ieee.numeric_std.all;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity time_counter is
+entity alarm_counter is
     Port ( clk_second : in  STD_LOGIC;
 			  x_out : out  STD_LOGIC_VECTOR (3 downto 0);
 			  y_out : out  STD_LOGIC_VECTOR (3 downto 0);
@@ -38,9 +38,9 @@ entity time_counter is
            b_out : out  STD_LOGIC_VECTOR (3 downto 0);
            c_out : out  STD_LOGIC_VECTOR (3 downto 0);
            d_out : out  STD_LOGIC_VECTOR (3 downto 0));
-end time_counter;
+end alarm_counter;
 
-architecture Behavioral of time_counter is
+architecture Behavioral of alarm_counter is
 
 signal count_h: integer:=0;
 signal count_m: integer:=0;
@@ -248,4 +248,5 @@ c_out <= s_bcd(7 downto 4);
 d_out <= s_bcd(3 downto 0);
 
 end Behavioral;
+
 
