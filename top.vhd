@@ -39,7 +39,8 @@ entity top is
 			  SetAlarmMode : in STD_LOGIC;
 			  IncHour : in STD_LOGIC;
 			  IncMin : in STD_LOGIC;
-			  IncSec : in STD_LOGIC
+			  IncSec : in STD_LOGIC;
+			  SetTime : in STD_LOGIC
 			  );
 end top;
 
@@ -66,6 +67,10 @@ end component;
 
 component time_counter is
     Port ( clk_second : in  STD_LOGIC;
+			  hour_in : in STD_LOGIC_VECTOR (7 downto 0);
+			  min_in : in STD_LOGIC_VECTOR (7 downto 0);
+			  sec_in : in STD_LOGIC_VECTOR (7 downto 0);
+			  set_time : in STD_LOGIC ;
 			  x_out : out  STD_LOGIC_VECTOR (3 downto 0);
 			  y_out : out  STD_LOGIC_VECTOR (3 downto 0);
            a_out : out  STD_LOGIC_VECTOR (3 downto 0);
@@ -79,6 +84,9 @@ component alarm_counter is
 			  inc_min : in STD_LOGIC;
 			  clk_m : in STD_LOGIC;
 			  inc_hour : in STD_LOGIC;
+			  hour_out : out STD_LOGIC_VECTOR (7 downto 0);
+			  min_out : out STD_LOGIC_VECTOR (7 downto 0);
+			  sec_out : out STD_LOGIC_VECTOR (7 downto 0);
 			  x_out : out  STD_LOGIC_VECTOR (3 downto 0);
 			  y_out : out  STD_LOGIC_VECTOR (3 downto 0);
            a_out : out  STD_LOGIC_VECTOR (3 downto 0);
@@ -109,6 +117,10 @@ signal a: std_logic_vector (3 downto 0);
 signal b: std_logic_vector (3 downto 0);
 signal c: std_logic_vector (3 downto 0);
 signal d: std_logic_vector (3 downto 0);
+
+signal hour: std_logic_vector (7 downto 0);
+signal min: std_logic_vector (7 downto 0);
+signal sec: std_logic_vector (7 downto 0);
 
 signal x_t: std_logic_vector (3 downto 0);
 signal y_t: std_logic_vector (3 downto 0);
@@ -157,7 +169,11 @@ port map (
 	a_out => a_t,
 	b_out => b_t,
 	c_out => c_t,
-	d_out => d_t
+	d_out => d_t,
+	hour_in => hour,
+	min_in => min,
+	sec_in => sec,
+	set_time => SetTime
 );
 
 a_counter : alarm_counter
@@ -166,6 +182,9 @@ port map (
 	inc_min => IncMin,
 	clk_m => clk_mux,
 	inc_sec => IncSec,
+	hour_out => hour,
+	min_out => min,
+	sec_out => sec,
 	x_out => x_a,
 	y_out => y_a,
 	a_out => a_a,

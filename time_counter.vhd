@@ -32,6 +32,10 @@ use ieee.numeric_std.all;
 
 entity time_counter is
     Port ( clk_second : in  STD_LOGIC;
+			  hour_in : in STD_LOGIC_VECTOR (7 downto 0);
+			  min_in : in STD_LOGIC_VECTOR (7 downto 0);
+			  sec_in : in STD_LOGIC_VECTOR (7 downto 0);
+			  set_time : in STD_LOGIC ;
 			  x_out : out  STD_LOGIC_VECTOR (3 downto 0);
 			  y_out : out  STD_LOGIC_VECTOR (3 downto 0);
            a_out : out  STD_LOGIC_VECTOR (3 downto 0);
@@ -45,6 +49,9 @@ architecture Behavioral of time_counter is
 signal count_h: integer:=0;
 signal count_m: integer:=0;
 signal count_s: integer:=0;
+signal h: integer:=0;
+signal m: integer:=0;
+signal s: integer:=0;
 
 signal clk_t_m: std_logic := '0';
 signal clk_t_h: std_logic := '0';
@@ -65,6 +72,12 @@ begin
 		clk_t_m <= '1';
 		end if;
 	end if;
+	
+	--- Set Time
+	if(set_time='1') then
+		count_s <= to_integer(unsigned(sec_in));
+	end if;
+
 	
 	case count_s is
 			when 0 => s_bcd <= "00000000" ;
@@ -131,6 +144,8 @@ begin
 			when others => s_bcd <= "00000000" ;
 	end case;
 	
+	
+	
 end process;
 
 process(clk_t_m)
@@ -144,6 +159,11 @@ begin
 		end if;
 	end if;
 	
+	--- Set Time
+	if(set_time='1') then
+		count_m <= to_integer(unsigned(min_in));
+	end if;
+		
 	case count_m is
 			when 0 => m_bcd <= "00000000" ;
 			when 1 => m_bcd <= "00000001" ;
@@ -220,6 +240,11 @@ begin
 		end if;
 	end if;
 	
+	--- Set Time
+	if(set_time='1') then
+		count_h <= to_integer(unsigned(hour_in));
+	end if;
+	
 	case count_h is
 			when 0 => h_bcd <= "00000000" ;
 			when 1 => h_bcd <= "00000001" ;
@@ -236,6 +261,12 @@ begin
 			when 12 => h_bcd <= "00010010" ;
 			when others => h_bcd <= "00000000" ;
 	end case;
+	
+end process;
+
+-- Set Time
+process (set_time)
+begin
 	
 end process;
 

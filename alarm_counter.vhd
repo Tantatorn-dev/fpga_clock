@@ -35,6 +35,9 @@ entity alarm_counter is
 			  inc_min : in STD_LOGIC;
 			  inc_hour : in STD_LOGIC;
 			  clk_m : in STD_LOGIC;
+			  hour_out : out STD_LOGIC_VECTOR (7 downto 0);
+			  min_out : out STD_LOGIC_VECTOR (7 downto 0);
+			  sec_out : out STD_LOGIC_VECTOR (7 downto 0);
 			  x_out : out  STD_LOGIC_VECTOR (3 downto 0);
 			  y_out : out  STD_LOGIC_VECTOR (3 downto 0);
            a_out : out  STD_LOGIC_VECTOR (3 downto 0);
@@ -57,6 +60,10 @@ signal s_bcd: std_logic_vector (7 downto 0);
 signal selected: integer := 0;
 
 begin
+
+hour_out <= std_logic_vector(to_unsigned(count_h, 8));
+min_out <= std_logic_vector(to_unsigned(count_m, 8));
+sec_out <= std_logic_vector(to_unsigned(count_s, 8));
 
 process(inc_hour)
 begin
