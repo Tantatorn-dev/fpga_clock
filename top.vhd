@@ -37,8 +37,9 @@ entity top is
 			  ViewMode : in STD_LOGIC;
            Common : out  STD_LOGIC_VECTOR (3 downto 0);
 			  SetAlarmMode : in STD_LOGIC;
-			  IncTime : in STD_LOGIC;
-			  DecTime : in STD_LOGIC
+			  IncHour : in STD_LOGIC;
+			  IncMin : in STD_LOGIC;
+			  IncSec : in STD_LOGIC
 			  );
 end top;
 
@@ -74,7 +75,10 @@ component time_counter is
 end component;
 
 component alarm_counter is
-    Port ( clk_second : in  STD_LOGIC;
+    Port ( inc_sec : in  STD_LOGIC;
+			  inc_min : in STD_LOGIC;
+			  clk_m : in STD_LOGIC;
+			  inc_hour : in STD_LOGIC;
 			  x_out : out  STD_LOGIC_VECTOR (3 downto 0);
 			  y_out : out  STD_LOGIC_VECTOR (3 downto 0);
            a_out : out  STD_LOGIC_VECTOR (3 downto 0);
@@ -129,6 +133,7 @@ signal clk_mux : std_logic;
 signal clk_s : std_logic;
 signal sevseg_in : std_logic_vector (3 downto 0);
 
+
 begin
 
 four_bit_to_sevseg : number_to_sevseg 
@@ -157,7 +162,10 @@ port map (
 
 a_counter : alarm_counter
 port map (
-	clk_second => clk_s,
+	inc_hour => IncHour,
+	inc_min => IncMin,
+	clk_m => clk_mux,
+	inc_sec => IncSec,
 	x_out => x_a,
 	y_out => y_a,
 	a_out => a_a,
@@ -212,6 +220,7 @@ port map (
 	s => std_logic_vector(to_unsigned(count_mux, 2)),
 	z => sevseg_in
 );
+
 
 -- increment value for display mux
 process (clk_mux)

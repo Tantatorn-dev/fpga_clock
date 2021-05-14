@@ -31,7 +31,10 @@ use ieee.numeric_std.all;
 --use UNISIM.VComponents.all;
 
 entity alarm_counter is
-    Port ( clk_second : in  STD_LOGIC;
+    Port ( inc_sec : in  STD_LOGIC;
+			  inc_min : in STD_LOGIC;
+			  inc_hour : in STD_LOGIC;
+			  clk_m : in STD_LOGIC;
 			  x_out : out  STD_LOGIC_VECTOR (3 downto 0);
 			  y_out : out  STD_LOGIC_VECTOR (3 downto 0);
            a_out : out  STD_LOGIC_VECTOR (3 downto 0);
@@ -46,25 +49,59 @@ signal count_h: integer:=0;
 signal count_m: integer:=0;
 signal count_s: integer:=0;
 
-signal clk_t_m: std_logic := '0';
-signal clk_t_h: std_logic := '0';
 
 signal h_bcd: std_logic_vector (7 downto 0);
 signal m_bcd: std_logic_vector (7 downto 0);
 signal s_bcd: std_logic_vector (7 downto 0);
 
+signal selected: integer := 0;
+
 begin
 
-process(clk_second)
+process(inc_hour)
 begin
-	if(clk_second'event and clk_second='1') then
+
+	if(inc_hour'event and inc_hour='1') then
+	
+		count_h <= count_h + 1;
+		if (count_h = 12) then
+		count_h <= 0;
+		end if;
+		
+	end if;
+		
+end process;
+
+process(inc_min)
+begin
+
+	if(inc_min'event and inc_min='1') then
+	
+		count_m <= count_m + 1;
+		if (count_m = 59) then
+		count_m <= 0;
+		end if;
+		
+	end if;
+		
+end process;
+
+process(inc_sec)
+begin
+
+	if(inc_sec'event and inc_sec='1') then
+	
 		count_s <= count_s + 1;
-		clk_t_m <= '0';
 		if (count_s = 59) then
 		count_s <= 0;
-		clk_t_m <= '1';
 		end if;
+		
 	end if;
+		
+end process;
+
+process(clk_m)
+begin
 	
 	case count_s is
 			when 0 => s_bcd <= "00000000" ;
@@ -131,19 +168,6 @@ begin
 			when others => s_bcd <= "00000000" ;
 	end case;
 	
-end process;
-
-process(clk_t_m)
-begin
-	if(clk_t_m'event and clk_t_m='1') then
-		count_m <= count_m + 1;
-		clk_t_h <= '0';
-		if (count_m = 59) then
-		count_m <= 0;
-		clk_t_h <= '1';
-		end if;
-	end if;
-	
 	case count_m is
 			when 0 => m_bcd <= "00000000" ;
 			when 1 => m_bcd <= "00000001" ;
@@ -208,17 +232,6 @@ begin
 			
 			when others => m_bcd <= "00000000" ;
 	end case;
-	
-end process;
-
-process(clk_t_h)
-begin
-	if(clk_t_h'event and clk_t_h='1') then
-		count_h <= count_h + 1;
-		if (count_h = 12) then
-		count_h <= 0;
-		end if;
-	end if;
 	
 	case count_h is
 			when 0 => h_bcd <= "00000000" ;
