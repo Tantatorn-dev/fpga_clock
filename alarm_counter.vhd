@@ -35,6 +35,7 @@ entity alarm_counter is
 			  inc_min : in STD_LOGIC;
 			  inc_hour : in STD_LOGIC;
 			  clk_m : in STD_LOGIC;
+			  snooze : in STD_LOGIC;
 			  hour_out : out STD_LOGIC_VECTOR (7 downto 0);
 			  min_out : out STD_LOGIC_VECTOR (7 downto 0);
 			  sec_out : out STD_LOGIC_VECTOR (7 downto 0);
@@ -89,6 +90,11 @@ begin
 		count_m <= 0;
 		end if;
 		
+	end if;
+	
+	--- Set Time
+	if(snooze='1') then
+		count_m <= 25;
 	end if;
 		
 end process;

@@ -58,6 +58,7 @@ end component;
 
 component clock_divider is
 	port ( clk: in std_logic;
+	         clock_out_2Hz: out std_logic;
 				clock_out_2000Hz: out std_logic;
 				clock_out_1Hz: out std_logic);
 end component;
@@ -65,6 +66,7 @@ end component;
 component mux4_4_1 is
 port(in1,in2, in3, in4: in STD_LOGIC_VECTOR (3 downto 0);
 	s: in STD_LOGIC_VECTOR (1 downto 0);
+	dot_in: in STD_LOGIC;
 	dot: out STD_LOGIC;
 	z, comm: out STD_LOGIC_VECTOR (3 downto 0));
 end component;
@@ -91,6 +93,7 @@ component alarm_counter is
 			  inc_min : in STD_LOGIC;
 			  clk_m : in STD_LOGIC;
 			  inc_hour : in STD_LOGIC;
+			  snooze : in STD_LOGIC;
 			  hour_out : out STD_LOGIC_VECTOR (7 downto 0);
 			  min_out : out STD_LOGIC_VECTOR (7 downto 0);
 			  sec_out : out STD_LOGIC_VECTOR (7 downto 0);
@@ -167,9 +170,11 @@ signal n4: std_logic_vector (3 downto 0);
 
 signal clk_mux : std_logic;
 signal clk_s : std_logic;
+signal clk_2Hz : std_logic;
 signal sevseg_in : std_logic_vector (3 downto 0);
 
 signal buzz : std_logic;
+signal dot_clk : std_logic;
 
 
 begin
@@ -184,7 +189,8 @@ divider : clock_divider
 port map (
 	clk => Clk,
 	clock_out_2000Hz => clk_mux,
-	clock_out_1Hz => clk_s
+	clock_out_1Hz => clk_s,
+	clock_out_2Hz => clk_2Hz
 );
 
 t_counter : time_counter
@@ -214,6 +220,7 @@ port map (
 	hour_out => hour_alarm,
 	min_out => min_alarm,
 	sec_out => sec_alarm,
+	snooze => Snooze,
 	x_out => x_a,
 	y_out => y_a,
 	a_out => a_a,
@@ -248,6 +255,7 @@ begin
 	 b <= b_a;
 	 c <= c_a;
 	 d <= d_a;
+	 dot_clk <= '1';
 	else
 	 x <= x_t;
 	 y <= y_t;
@@ -255,6 +263,7 @@ begin
 	 b <= b_t;
 	 c <= c_t;
 	 d <= d_t;
+	 dot_clk <= clk_2Hz;
 	end if;
 end process;
 
@@ -279,6 +288,7 @@ port map (
 	in2 => n2,
 	in3 => n3,
 	in4 => n4,
+	dot_in => dot_clk,
 	dot => Dot,
 	comm => Common,
 	s => std_logic_vector(to_unsigned(count_mux, 2)),

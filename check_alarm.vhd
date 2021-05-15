@@ -54,7 +54,7 @@ begin
 		is_alarm <= '1';
 	end if;
 	
-	if (stop_alarm = '1') then
+	if (stop_alarm = '1' or snooze ='1') then
 		is_alarm <= '0';
 	end if;
 end process;

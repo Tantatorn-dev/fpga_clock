@@ -24,6 +24,7 @@ entity mux4_4_1 is
 port(in1,in2, in3, in4 : in STD_LOGIC_VECTOR (3 downto 0);
 	s: in STD_LOGIC_VECTOR (1 downto 0);
 	dot: out STD_LOGIC;
+	dot_in: in STD_LOGIC;
 	comm: out STD_LOGIC_VECTOR (3 downto 0);
 	z: out STD_LOGIC_VECTOR (3 downto 0));
 end mux4_4_1;
@@ -41,7 +42,7 @@ begin
 	elsif (s ="01") then
 		z <= in2;
 		comm <= "1011";
-		dot <= '1';
+		dot <= dot_in;
 	elsif (s ="10") then
 		z <= in3;
 		comm <= "1101";

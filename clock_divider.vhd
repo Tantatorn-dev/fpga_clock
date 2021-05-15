@@ -24,6 +24,7 @@ use IEEE.numeric_std.ALL;
 entity clock_divider is
 	port ( clk: in std_logic;
 				clock_out_2000Hz: out std_logic;
+				clock_out_2Hz: out std_logic;
 				clock_out_1Hz: out std_logic);
 end clock_divider;
   
@@ -31,8 +32,10 @@ architecture bhv of clock_divider is
   
 	signal count: integer:=1;
 	signal count0: integer:=1;
+	signal count1: integer:=1;
 	signal tmp : std_logic := '0';
 	signal tmp0 : std_logic := '0';
+	signal tmp1 : std_logic := '0';
   
 begin
   
@@ -46,6 +49,18 @@ begin
 		end if;
 	end if;
 clock_out_1Hz <= tmp;
+end process;
+
+process(clk)
+begin
+	if(clk'event and clk='1') then
+		count1 <= count1+1;
+		if (count1 = 10000000) then
+		tmp1 <= NOT tmp1;
+		count1 <= 1;
+		end if;
+	end if;
+clock_out_2Hz <= tmp1;
 end process;
 
 process(clk)
