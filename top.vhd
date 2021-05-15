@@ -40,7 +40,11 @@ entity top is
 			  IncHour : in STD_LOGIC;
 			  IncMin : in STD_LOGIC;
 			  IncSec : in STD_LOGIC;
-			  SetTime : in STD_LOGIC
+			  SetTime : in STD_LOGIC;
+			  Buzzer : out STD_LOGIC;
+			  StopAlarm : in STD_LOGIC;
+			  Snooze : in STD_LOGIC;
+			  MuteBuzzer : in STD_LOGIC
 			  );
 end top;
 
@@ -71,6 +75,9 @@ component time_counter is
 			  min_in : in STD_LOGIC_VECTOR (7 downto 0);
 			  sec_in : in STD_LOGIC_VECTOR (7 downto 0);
 			  set_time : in STD_LOGIC ;
+			  hour_out : out STD_LOGIC_VECTOR (7 downto 0);
+			  min_out : out STD_LOGIC_VECTOR (7 downto 0);
+			  sec_out : out STD_LOGIC_VECTOR (7 downto 0);
 			  x_out : out  STD_LOGIC_VECTOR (3 downto 0);
 			  y_out : out  STD_LOGIC_VECTOR (3 downto 0);
            a_out : out  STD_LOGIC_VECTOR (3 downto 0);
@@ -109,6 +116,19 @@ component view_controller is
            view_select : in  STD_LOGIC);
 end component;
 
+component check_alarm is
+    Port ( stop_alarm : in  STD_LOGIC;
+           hour_t : in  STD_LOGIC_VECTOR (7 downto 0);
+           min_t : in  STD_LOGIC_VECTOR (7 downto 0);
+           sec_t : in  STD_LOGIC_VECTOR (7 downto 0);
+           hour_a : in  STD_LOGIC_VECTOR (7 downto 0);
+           min_a : in  STD_LOGIC_VECTOR (7 downto 0);
+           sec_a : in  STD_LOGIC_VECTOR (7 downto 0);
+           snooze : in  STD_LOGIC;
+			  clk_activate : in STD_LOGIC;
+           buzzer : out  STD_LOGIC );
+end component;
+
 signal count_mux : integer := 0;
 
 signal x: std_logic_vector (3 downto 0);
@@ -118,9 +138,13 @@ signal b: std_logic_vector (3 downto 0);
 signal c: std_logic_vector (3 downto 0);
 signal d: std_logic_vector (3 downto 0);
 
-signal hour: std_logic_vector (7 downto 0);
-signal min: std_logic_vector (7 downto 0);
-signal sec: std_logic_vector (7 downto 0);
+signal hour_time: std_logic_vector (7 downto 0);
+signal min_time: std_logic_vector (7 downto 0);
+signal sec_time: std_logic_vector (7 downto 0);
+
+signal hour_alarm: std_logic_vector (7 downto 0);
+signal min_alarm: std_logic_vector (7 downto 0);
+signal sec_alarm: std_logic_vector (7 downto 0);
 
 signal x_t: std_logic_vector (3 downto 0);
 signal y_t: std_logic_vector (3 downto 0);
@@ -144,6 +168,8 @@ signal n4: std_logic_vector (3 downto 0);
 signal clk_mux : std_logic;
 signal clk_s : std_logic;
 signal sevseg_in : std_logic_vector (3 downto 0);
+
+signal buzz : std_logic;
 
 
 begin
@@ -170,9 +196,12 @@ port map (
 	b_out => b_t,
 	c_out => c_t,
 	d_out => d_t,
-	hour_in => hour,
-	min_in => min,
-	sec_in => sec,
+	hour_in => hour_alarm,
+	min_in => min_alarm,
+	sec_in => sec_alarm,
+	hour_out => hour_time,
+	min_out => min_time,
+	sec_out => sec_time,
 	set_time => SetTime
 );
 
@@ -182,9 +211,9 @@ port map (
 	inc_min => IncMin,
 	clk_m => clk_mux,
 	inc_sec => IncSec,
-	hour_out => hour,
-	min_out => min,
-	sec_out => sec,
+	hour_out => hour_alarm,
+	min_out => min_alarm,
+	sec_out => sec_alarm,
 	x_out => x_a,
 	y_out => y_a,
 	a_out => a_a,
@@ -192,6 +221,22 @@ port map (
 	c_out => c_a,
 	d_out => d_a
 );  
+
+alarm : check_alarm
+port map (
+	stop_alarm => StopAlarm,
+   hour_t => hour_time,
+   min_t => min_time,
+   sec_t => sec_time,
+   hour_a => hour_alarm,
+   min_a => min_alarm,
+   sec_a => sec_alarm,
+   snooze => Snooze,
+	clk_activate => clk_mux,
+   buzzer => buzz
+);
+
+Buzzer <= buzz and MuteBuzzer;
 
 -- check which mode is on : time or set alarm mode
 process (clk_s, SetAlarmMode)

@@ -36,6 +36,9 @@ entity time_counter is
 			  min_in : in STD_LOGIC_VECTOR (7 downto 0);
 			  sec_in : in STD_LOGIC_VECTOR (7 downto 0);
 			  set_time : in STD_LOGIC ;
+			  hour_out : out STD_LOGIC_VECTOR (7 downto 0);
+			  min_out : out STD_LOGIC_VECTOR (7 downto 0);
+			  sec_out : out STD_LOGIC_VECTOR (7 downto 0);
 			  x_out : out  STD_LOGIC_VECTOR (3 downto 0);
 			  y_out : out  STD_LOGIC_VECTOR (3 downto 0);
            a_out : out  STD_LOGIC_VECTOR (3 downto 0);
@@ -62,6 +65,10 @@ signal s_bcd: std_logic_vector (7 downto 0);
 
 begin
 
+hour_out <= std_logic_vector(to_unsigned(count_h, 8));
+min_out <= std_logic_vector(to_unsigned(count_m, 8));
+sec_out <= std_logic_vector(to_unsigned(count_s, 8));
+
 process(clk_second)
 begin
 	if(clk_second'event and clk_second='1') then
@@ -78,7 +85,6 @@ begin
 		count_s <= to_integer(unsigned(sec_in));
 	end if;
 
-	
 	case count_s is
 			when 0 => s_bcd <= "00000000" ;
 			when 1 => s_bcd <= "00000001" ;
@@ -264,11 +270,7 @@ begin
 	
 end process;
 
--- Set Time
-process (set_time)
-begin
-	
-end process;
+
 
 x_out <= h_bcd(7 downto 4);
 y_out <= h_bcd(3 downto 0);

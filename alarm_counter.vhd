@@ -49,7 +49,7 @@ end alarm_counter;
 architecture Behavioral of alarm_counter is
 
 signal count_h: integer:=0;
-signal count_m: integer:=0;
+signal count_m: integer:=10;
 signal count_s: integer:=0;
 
 
